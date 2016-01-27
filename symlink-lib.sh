@@ -1,3 +1,3 @@
 source ./library-symlinks.sh
 
-symlink_lib 'connection'
+symlink_lib 'client' 'connection'
