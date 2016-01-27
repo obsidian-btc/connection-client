@@ -11,4 +11,6 @@ require 'test_bench'; TestBench.activate
 
 require 'connection/client/controls'
 
+Connection::Client::Controls::TestServer.verify_running
+
 Telemetry::Logger::AdHoc.activate

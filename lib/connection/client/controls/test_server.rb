@@ -116,7 +116,7 @@ class Connection
           socket = TCPSocket.new '127.0.0.1', port
           socket.close
 
-        rescue SocketError
+        rescue Errno::ECONNREFUSED
           logger.error 'You must run the test server via `ruby lib/networking/controls/test_server/run.rb`'
           exit 1
         end
