@@ -113,6 +113,11 @@ class Connection
       end
     end
 
+    def self.configure(receiver, *arguments)
+      instance = build *arguments
+      receiver.connection = instance
+    end
+
     module Assertions
       def reconnects_after_close?
         close
