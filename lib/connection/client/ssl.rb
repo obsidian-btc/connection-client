@@ -36,7 +36,7 @@ class Connection
         @ssl_context ||=
           begin
             context = OpenSSL::SSL::SSLContext.new
-            context.verify_mode = OpenSSL::SSL::VERIFY_PEER
+            context.set_params verify_mode: OpenSSL::SSL::VERIFY_PEER
             context
           end
       end
