@@ -117,7 +117,7 @@ class Connection
           socket.close
 
         rescue Errno::ECONNREFUSED
-          run_rb = File.expand_path 'test_server/run', __dir__
+          run_rb = File.expand_path 'test_server/run.rb', __dir__
           logger.error "You must run the test server via `ruby #{run_rb}`"
           exit 1
         end
