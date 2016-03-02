@@ -1,10 +1,10 @@
 require_relative './spec_init'
 
-context 'Client Connection' do
-  context 'Never reconnect policy' do
+context "Client Connection" do
+  context "Never reconnect policy" do
     policy = Connection::Client::ReconnectPolicy::Never.new
 
-    test 'Does not re-establish a closed connection' do
+    test "Does not re-establish a closed connection" do
       connection = Connection::Client::Substitute.build
 
       connection.close
@@ -14,7 +14,7 @@ context 'Client Connection' do
       assert connection.closed?
     end
 
-    test 'Does not close an open connection' do
+    test "Does not close an open connection" do
       connection = Connection::Client::Substitute.build
 
       policy.control_connection connection
@@ -23,10 +23,10 @@ context 'Client Connection' do
     end
   end
 
-  context 'When Closed reconnect policy' do
-    policy = Connection::Client::ReconnectPolicy::WhenClosed.new
+  context "When Closed reconnect policy" do
+    policy = Connection::Client::ReconnectPolicy::Closed.new
 
-    test 'Re-establishes an open connection' do
+    test "Re-establishes an open connection" do
       connection = Connection::Client::Substitute.build
       connection.close
 
@@ -35,7 +35,7 @@ context 'Client Connection' do
       assert !connection.closed?
     end
 
-    test 'Does not close an open connection' do
+    test "Does not close an open connection" do
       connection = Connection::Client::Substitute.build
 
       policy.control_connection connection
@@ -44,14 +44,14 @@ context 'Client Connection' do
     end
   end
 
-  context 'Resolving a reconnect policy' do
-    test 'Exists' do
+  context "Resolving a reconnect policy" do
+    test "Exists" do
       policy = Connection::Client::ReconnectPolicy.get :never
 
       assert policy.is_a?(Connection::Client::ReconnectPolicy)
     end
 
-    test 'Does not exist' do
+    test "Does not exist" do
       begin
         Connection::Client::ReconnectPolicy.get :not_a_policy
       rescue Connection::Client::ReconnectPolicy::Error => error

@@ -14,8 +14,8 @@ context 'Client Connection' do
         assert client.closed?
       end
 
-      test 'Setting policy to WhenClosed' do
-        client = Connection::Client.build host, port, :reconnect => :when_closed
+      test 'Setting policy to Closed' do
+        client = Connection::Client.build host, port, :reconnect => :closed
 
         assert client do
           reconnects_after_close?
@@ -27,6 +27,7 @@ context 'Client Connection' do
       scheduler = Object.new
 
       client = Connection::Client.build host, port, :scheduler => scheduler
+      client.close
 
       assert client do
         scheduler_configured? scheduler
