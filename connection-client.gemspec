@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 Gem::Specification.new do |s|
   s.name = 'connection-client'
-  s.version = '0.1.1.0'
+  s.version = '0.1.1.1'
   s.summary = 'TCP client connection library offering both blocking and non/blocking operation'
   s.description = ' '
 
