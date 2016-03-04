@@ -5,7 +5,7 @@ class Connection
         reconnect_policy = ReconnectPolicy.get :never
 
         instance = new '<substitute>', 0, reconnect_policy
-        Telemetry::Logger.configure instance
+        ::Telemetry::Logger.configure instance
         instance
       end
 

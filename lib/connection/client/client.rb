@@ -8,6 +8,7 @@ class Connection
 
     dependency :logger, Telemetry::Logger
     dependency :scheduler, Scheduler
+    dependency :telemetry, Telemetry
 
     def initialize(host, port, reconnect_policy)
       @host = host
@@ -34,7 +35,8 @@ class Connection
         Scheduler.configure instance
       end
 
-      Telemetry::Logger.configure instance
+      ::Telemetry.configure instance
+      ::Telemetry::Logger.configure instance
       instance
     end
 
@@ -70,7 +72,9 @@ class Connection
 
     def gets(*arguments)
       connected do
-        socket.gets *arguments
+        data = socket.gets *arguments
+        telemetry.record :read, Telemetry::Read.new(data) if data
+        data
       end
     end
 
@@ -88,13 +92,17 @@ class Connection
 
     def read(*arguments)
       connected do
-        socket.read *arguments
+        data = socket.read *arguments
+        telemetry.record :read, Telemetry::Read.new(data) if data
+        data
       end
     end
 
     def readline(*arguments)
       connected do
-        socket.readline *arguments
+        data = socket.readline *arguments
+        telemetry.record :read, Telemetry::Read.new(data) if data
+        data
       end
     end
 
@@ -106,15 +114,60 @@ class Connection
       @socket ||= build_connection
     end
 
-    def write(*arguments)
+    def write(data)
       connected do
-        socket.write *arguments
+        bytes_written = socket.write data
+        telemetry.record :written, Telemetry::Written.new(data)
+        bytes_written
       end
     end
 
     def self.configure(receiver, *arguments)
       instance = build *arguments
       receiver.connection = instance
+    end
+
+    def self.register_telemetry_sink(connection)
+      sink = Telemetry.sink
+      connection.telemetry.register sink
+      sink
+    end
+
+    module Telemetry
+      class Sink
+        include ::Telemetry::Sink
+
+        record :written
+        record :read
+
+        def read?(bytes=nil)
+          recorded_read? do |record|
+            if bytes.nil?
+              true
+            else
+              record.data.bytes == bytes
+            end
+          end
+        end
+
+        def wrote?(bytes=nil)
+          recorded_written? do |record|
+            if bytes.nil?
+              true
+            else
+              record.data.bytes == bytes
+            end
+          end
+        end
+      end
+
+      IO = Struct.new :bytes
+      Read = Class.new IO
+      Written = Class.new IO
+
+      def self.sink
+        Sink.new
+      end
     end
 
     module Assertions

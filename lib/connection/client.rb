@@ -1,3 +1,5 @@
+require 'telemetry'
+
 require 'connection'
 
 require 'connection/client/client'

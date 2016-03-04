@@ -5,7 +5,7 @@ class Connection
         attr_reader :poll_period
         attr_reader :server_sockets
 
-        dependency :logger, Telemetry::Logger
+        dependency :logger, ::Telemetry::Logger
 
         def initialize(server_sockets, poll_period)
           @poll_period = poll_period
@@ -24,7 +24,7 @@ class Connection
           logger.opt_debug "Server sockets established (Unencrypted Port: #{port}, SSL Port: #{ssl_port})"
 
           instance = new [server_socket, ssl_server_socket], poll_period
-          Telemetry::Logger.configure instance
+          ::Telemetry::Logger.configure instance
           instance
         end
 

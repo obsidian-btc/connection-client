@@ -4,11 +4,11 @@ class Connection
       class Never
         include ReconnectPolicy
 
-        dependency :logger, Telemetry::Logger
+        dependency :logger, ::Telemetry::Logger
 
         def self.build
           instance = new
-          Telemetry::Logger.configure instance
+          ::Telemetry::Logger.configure instance
           instance
         end
 

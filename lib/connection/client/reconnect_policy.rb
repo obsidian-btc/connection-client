@@ -9,7 +9,7 @@ class Connection
       end
 
       def logger
-        Telemetry::Logger.get self
+        ::Telemetry::Logger.get self
       end
 
       def policy_class(policy_name=nil)
