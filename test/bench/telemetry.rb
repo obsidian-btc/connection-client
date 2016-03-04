@@ -13,7 +13,7 @@ context "Capturing Telemetry" do
     client.close
 
     assert sink do
-      wrote?("1\n") && read?("0\n")
+      written?("1\n") && read?("0\n")
     end
   end
 

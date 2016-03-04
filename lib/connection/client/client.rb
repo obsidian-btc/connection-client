@@ -150,7 +150,7 @@ class Connection
           end
         end
 
-        def wrote?(bytes=nil)
+        def written?(bytes=nil)
           recorded_written? do |record|
             if bytes.nil?
               true
