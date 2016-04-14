@@ -19,8 +19,6 @@ class Connection
       reconnect ||= :never
       reconnect_policy = ReconnectPolicy.get reconnect
 
-      scheduler ||= Scheduler::Blocking.build
-
       if ssl
         instance = SSL.new host, port, reconnect_policy
         instance.ssl_context = ssl if ssl.is_a? OpenSSL::SSL::SSLContext
@@ -36,6 +34,7 @@ class Connection
 
       ::Telemetry.configure instance
       ::Telemetry::Logger.configure instance
+
       instance
     end
 
@@ -117,6 +116,7 @@ class Connection
     def connection
       @connection ||= build_connection
     end
+    alias_method :connect, :connection
 
     def write(data)
       connected do
