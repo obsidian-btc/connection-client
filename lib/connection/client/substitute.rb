@@ -14,15 +14,15 @@ class Connection
       end
 
       def eof
-        socket.eof
+        connection.eof
       end
 
       def expect_read(data)
-        socket.expect_read data
+        connection.expect_read data
       end
 
       def expect_write(data)
-        socket.expect_write data
+        connection.expect_write data
       end
     end
   end

@@ -3,8 +3,7 @@ class Connection
     attr_reader :host
     attr_reader :port
     attr_reader :reconnect_policy
-    attr_reader :scheduler
-    attr_writer :socket
+    attr_writer :connection
 
     dependency :logger, Telemetry::Logger
     dependency :scheduler, Scheduler
@@ -43,36 +42,41 @@ class Connection
     def build_connection
       logger.opt_trace "Establishing connection (Host: #{host.inspect}, Port: #{port})"
 
-      socket = establish_connection
+      connection = establish_connection
 
-      logger.opt_debug "Established connection (Host: #{host.inspect}, Port: #{port}, Fileno: #{Fileno.get socket})"
+      logger.opt_debug "Established connection (Host: #{host.inspect}, Port: #{port}, Fileno: #{Fileno.get connection})"
 
-      Connection.build socket, scheduler
+      Connection.build connection, scheduler
+    end
+
+    def change_connection_scheduler(scheduler)
+      self.scheduler = scheduler
+      connection.scheduler = scheduler
     end
 
     def close
-      logger.opt_trace "Closing socket (Host: #{host.inspect}, Port: #{port}, Fileno: #{fileno})"
+      logger.opt_trace "Closing connection (Host: #{host.inspect}, Port: #{port}, Fileno: #{fileno})"
 
-      socket.close
+      connection.close
 
-      logger.opt_debug "Closed socket (Host: #{host.inspect}, Port: #{port})"
+      logger.opt_debug "Closed connection (Host: #{host.inspect}, Port: #{port})"
     end
 
     def closed?
-      socket.closed?
+      connection.closed?
     end
 
     def connected(&block)
-      if socket
+      if connection
         reconnect_policy.control_connection self
       end
 
-      block.(socket)
+      block.(connection)
     end
 
     def gets(*arguments)
       connected do
-        data = socket.gets *arguments
+        data = connection.gets *arguments
         telemetry.record :read, Telemetry::Read.new(data) if data
         data
       end
@@ -83,16 +87,16 @@ class Connection
     end
 
     def fileno
-      socket.fileno
+      connection.fileno
     end
 
     def io
-      socket.io
+      connection.io
     end
 
     def read(*arguments)
       connected do
-        data = socket.read *arguments
+        data = connection.read *arguments
         telemetry.record :read, Telemetry::Read.new(data) if data
         data
       end
@@ -100,23 +104,23 @@ class Connection
 
     def readline(*arguments)
       connected do
-        data = socket.readline *arguments
+        data = connection.readline *arguments
         telemetry.record :read, Telemetry::Read.new(data) if data
         data
       end
     end
 
     def reconnect
-      self.socket = nil
+      self.connection = nil
     end
 
-    def socket
-      @socket ||= build_connection
+    def connection
+      @connection ||= build_connection
     end
 
     def write(data)
       connected do
-        bytes_written = socket.write data
+        bytes_written = connection.write data
         telemetry.record :written, Telemetry::Written.new(data)
         bytes_written
       end
@@ -175,7 +179,7 @@ class Connection
         close
 
         reconnected = connected do
-          !socket.closed?
+          !connection.closed?
         end
 
         close
@@ -184,7 +188,7 @@ class Connection
       end
 
       def scheduler_configured?(expected_scheduler)
-        socket.scheduler == expected_scheduler
+        connection.scheduler == expected_scheduler
       end
     end
   end

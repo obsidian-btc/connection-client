@@ -123,7 +123,7 @@ class Connection
         end
 
         def self.logger
-          Telemetry::Logger.get self
+          ::Telemetry::Logger.get self
         end
 
         def self.poll_period
